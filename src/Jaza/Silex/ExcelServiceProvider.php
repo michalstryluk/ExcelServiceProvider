@@ -10,8 +10,8 @@
 
 namespace Jaza\Silex;
 
-use Silex\Application;
-use Silex\ServiceProviderInterface;
+use Pimple\Container;
+use Pimple\ServiceProviderInterface;
 
 use n3b\Bundle\Util\HttpFoundation\StreamResponse\StreamWriterWrapper;
 use n3b\Bundle\Util\HttpFoundation\StreamResponse\StreamResponse;
@@ -25,9 +25,9 @@ use Jaza\Silex\ExcelContainer;
  */
 class ExcelServiceProvider implements ServiceProviderInterface
 {
-    public function register(Application $app)
+    public function register(Container $app)
     {
-        $app['xls.service_xls5'] = $app->share(function ($app) {
+        $app['xls.service_xls5'] = function ($app) {
             $objPHPExcel = new \PHPExcel();
             $factory = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
             
@@ -36,10 +36,10 @@ class ExcelServiceProvider implements ServiceProviderInterface
             $streamWriter = new StreamWriterWrapper('php://output');
             $streamWriter->setWriter($factory, 'save');
             return new ExcelContainer($objPHPExcel, $streamWriter, StreamResponse);
-        });
+        };
     }
 
-    public function boot(Application $app)
+    public function boot(Container $app)
     {
     }
 }
